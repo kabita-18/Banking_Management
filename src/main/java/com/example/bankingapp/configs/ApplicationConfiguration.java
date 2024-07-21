@@ -1,9 +1,9 @@
 package com.example.bankingapp.configs;
 
 import com.example.bankingapp.model.RegisterUser;
-import com.example.bankingapp.model.User;
+
 import com.example.bankingapp.repository.RegisterUsersRepository;
-import com.example.bankingapp.repository.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

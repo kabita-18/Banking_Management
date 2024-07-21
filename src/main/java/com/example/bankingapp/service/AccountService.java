@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.example.bankingapp.model.Accounts;
+import com.example.bankingapp.model.Login;
+import com.example.bankingapp.model.RegisterUser;
 import com.example.bankingapp.model.Transactions;
 
 public interface AccountService {
@@ -32,6 +34,10 @@ public interface AccountService {
 	void saveCsvLocally(byte[] csvData, String filePath) throws IOException;
 
 	int deleteByAccountNumber(Long accountNumber);
+
+	boolean registerUser(RegisterUser registerUser) throws AccountServiceException;
+
+	String login(Login login) throws AccountServiceException;
 	
 	
 }

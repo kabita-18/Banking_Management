@@ -5,10 +5,17 @@ import java.util.Date;
 import java.util.List;
 
 import com.example.bankingapp.model.Accounts;
+import com.example.bankingapp.model.Login;
+import com.example.bankingapp.model.RegisterUser;
 import com.example.bankingapp.model.Transactions;
+import com.example.bankingapp.service.AccountServiceException;
 
 public interface AccountDAO {
 
+	boolean registerUser(RegisterUser registerUser);
+	
+	String login(Login login) throws AccountServiceException;
+	
 	boolean addAccount(Accounts account);
 
 	Accounts getAccountdetailsByAccountNumber(long accountNumber);
@@ -33,5 +40,9 @@ public interface AccountDAO {
 	void saveCsvLocally(byte[] csvData, String filePath) throws IOException;
 	
 	public int deleteByAccountNumber(Long accountNumber);
+
+	
+
+	
 
 }

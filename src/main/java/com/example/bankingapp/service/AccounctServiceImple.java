@@ -10,14 +10,28 @@ import org.springframework.stereotype.Service;
 
 import com.example.bankingapp.DAO.AccountDAO;
 import com.example.bankingapp.model.Accounts;
-import com.example.bankingapp.model.Transactions;
+import com.example.bankingapp.model.Login;
+import com.example.bankingapp.model.RegisterUser;
+
 
 @Service
-
 public class AccounctServiceImple implements AccountService {
 	
 	@Autowired
 	public AccountDAO accountDao;
+	
+	@Override
+	public boolean registerUser(RegisterUser registerUser)throws AccountServiceException {
+		// TODO Auto-generated method stub
+		return accountDao.registerUser(registerUser);
+	}
+
+
+	@Override
+	public String login(Login login) throws AccountServiceException{
+		// TODO Auto-generated method stub
+		return accountDao.login(login);
+	}
 
 	@Override
 	public boolean addAccount(Accounts account) {
@@ -90,6 +104,9 @@ public class AccounctServiceImple implements AccountService {
 		return accountDao.deleteByAccountNumber(accountNumber);
 	}
 
+
+
+	
 	
 	
 

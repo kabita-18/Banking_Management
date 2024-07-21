@@ -13,30 +13,82 @@ import java.util.Optional;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import com.example.bankingapp.model.Accounts;
+import com.example.bankingapp.model.Login;
+import com.example.bankingapp.model.RegisterUser;
 import com.example.bankingapp.model.Transactions;
 import com.example.bankingapp.repository.AccountRepository;
+import com.example.bankingapp.repository.RegisterUsersRepository;
 import com.example.bankingapp.repository.TransactionRepository;
+import com.example.bankingapp.security.JwtTokenProvider;
+import com.example.bankingapp.service.AccountServiceException;
 
 import jakarta.transaction.Transactional;
 
 
 @Repository
 public class AccountDAOImpl implements AccountDAO {
+
+	@Autowired
+	private JwtTokenProvider jwtTokenProvider;
 	
 	@Autowired
 	public AccountRepository Repo;
 	
 	@Autowired
 	public TransactionRepository transactionRepo;
+	
+	@Autowired
+	public RegisterUsersRepository registerUsersRepository;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+	 
+	@Override
+	public String login(Login login) throws AccountServiceException {
+		try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(login.getUsernameOrEmail(), login.getPassword())
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println(authentication);
+
+            return jwtTokenProvider.generateToken(authentication);
+        } catch (Exception e) {
+            throw new AccountServiceException("Invalid credentials");
+        }
+	}
+
+	@Override
+	public boolean registerUser(RegisterUser registerUser) {
+		
+		if (registerUsersRepository.findByEmail(registerUser.getEmail()).size() != 0) {
+            return false; 
+        }
+		registerUser.setPassword(passwordEncoder.encode(registerUser.getPassword()));
+		if(registerUsersRepository.save(registerUser) != null) return true;
+		return false;
+	}
 
 	@Override
 	public boolean addAccount(Accounts account) {
 		System.out.println(account.getEmail());
 		System.out.println(Repo.findByEmail(account.getEmail()).size());
+		
 		if(Repo.findByEmail(account.getEmail()).size() != 0 ) return false;
+		
 		if(Repo.save(account) != null) return true;
 		return false;
 	}
@@ -186,9 +238,5 @@ public class AccountDAOImpl implements AccountDAO {
 		return 0;
 		
 	}
-
-
-
-	
 
 }

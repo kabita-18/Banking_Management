@@ -87,22 +87,34 @@ public class AccounctServiceImple implements AccountService {
 		// TODO Auto-generated method stub
 		return accountDao.getTransactionHistory(accountNumber);
 	}
-
-	@Override
-	public byte[] generateCsv(List<Object[]> transactions) throws Exception {
-		// TODO Auto-generated method stub
-		return accountDao.generateCsv(transactions);
-	}
-
-	@Override
-	public void saveCsvLocally(byte[] csvData, String filePath) throws IOException {
-		accountDao.saveCsvLocally(csvData, filePath);
-	}
+//
+//	@Override
+//	public byte[] generateCsv(List<Object[]> transactions) throws Exception {
+//		// TODO Auto-generated method stub
+//		return accountDao.generateCsv(transactions);
+//	}
+//
+//	@Override
+//	public void saveCsvLocally(byte[] csvData, String filePath) throws IOException {
+//		accountDao.saveCsvLocally(csvData, filePath);
+//	}
 
 	@Override
 	public int deleteByAccountNumber(Long accountNumber) {
 		return accountDao.deleteByAccountNumber(accountNumber);
 	}
+
+
+	@Override
+	public byte[] generatePdf(List<Object[]> transactions) throws IOException {
+		// TODO Auto-generated method stub
+		return accountDao.generatePdf(transactions);
+	}
+
+	@Override
+    public void savePdfLocally(byte[] pdfData, String filePath) throws IOException {
+        accountDao.savePdfLocally(pdfData, filePath);
+    }
 
 
 

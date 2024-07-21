@@ -28,16 +28,20 @@ public interface AccountService {
 	boolean transferMoney(long fromAccountNumber, long toAccountNumber, double amount);
 
 	List<Object[]> getTransactionHistory(Long accountNumber);
-
-	byte[] generateCsv(List<Object[]> transactions) throws Exception;
-
-	void saveCsvLocally(byte[] csvData, String filePath) throws IOException;
+//
+//	byte[] generateCsv(List<Object[]> transactions) throws Exception;
+//
+//	void saveCsvLocally(byte[] csvData, String filePath) throws IOException;
 
 	int deleteByAccountNumber(Long accountNumber);
 
 	boolean registerUser(RegisterUser registerUser) throws AccountServiceException;
 
 	String login(Login login) throws AccountServiceException;
+
+	byte[] generatePdf(List<Object[]> transactions) throws IOException;
+
+	void savePdfLocally(byte[] pdfData, String filePath) throws IOException;
 	
 	
 }

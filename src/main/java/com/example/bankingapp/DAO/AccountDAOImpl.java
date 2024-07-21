@@ -2,6 +2,7 @@ package com.example.bankingapp.DAO;
 
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -29,6 +31,13 @@ import com.example.bankingapp.repository.RegisterUsersRepository;
 import com.example.bankingapp.repository.TransactionRepository;
 import com.example.bankingapp.security.JwtTokenProvider;
 import com.example.bankingapp.service.AccountServiceException;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 
 import jakarta.transaction.Transactional;
 
@@ -195,36 +204,36 @@ public class AccountDAOImpl implements AccountDAO {
 	}
 
 
-	@Override
-	public byte[] generateCsv(List<Object[]> transactions) throws Exception {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CSVPrinter printer = new CSVPrinter(new PrintWriter(out), CSVFormat.DEFAULT.withHeader("Transaction ID", "Status", "To Account", "From Account", "Amount", "Timestamp"));
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        for (Object[] transaction : transactions) {
-            printer.printRecord(
-                transaction[0],           
-                transaction[1],           
-                transaction[2],            
-                transaction[3],            
-                transaction[4],            
-                dateFormat.format(transaction[5])   
-            );
-        }
-
-        printer.flush();
-        return out.toByteArray();
-	}
-	public void saveCsvLocally(byte[] csvData, String filePath) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(filePath)) {
-            fos.write(csvData);
-        } catch (IOException e) {
-            e.printStackTrace();
-          
-            System.err.println("Error saving CSV file: " + e.getMessage());
-        }
-    }
+//	@Override
+//	public byte[] generateCsv(List<Object[]> transactions) throws Exception {
+//		ByteArrayOutputStream out = new ByteArrayOutputStream();
+//        CSVPrinter printer = new CSVPrinter(new PrintWriter(out), CSVFormat.DEFAULT.withHeader("Transaction ID", "Status", "To Account", "From Account", "Amount", "Timestamp"));
+//
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//
+//        for (Object[] transaction : transactions) {
+//            printer.printRecord(
+//                transaction[0],           
+//                transaction[1],           
+//                transaction[2],            
+//                transaction[3],            
+//                transaction[4],            
+//                dateFormat.format(transaction[5])   
+//            );
+//        }
+//
+//        printer.flush();
+//        return out.toByteArray();
+//	}
+//	public void saveCsvLocally(byte[] csvData, String filePath) throws IOException {
+//        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+//            fos.write(csvData);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//          
+//            System.err.println("Error saving CSV file: " + e.getMessage());
+//        }
+//    }
 
 	@Override
 	public int deleteByAccountNumber(Long accountNumber) {
@@ -239,4 +248,51 @@ public class AccountDAOImpl implements AccountDAO {
 		
 	}
 
+	public byte[] generatePdf(List<Object[]> transactions) throws DocumentException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Document document = new Document();
+        PdfWriter.getInstance(document, byteArrayOutputStream);
+
+        document.open();
+
+        document.add(new Paragraph("  Transaction History   "));
+
+        PdfPTable table = new PdfPTable(6); 
+        addTableHeader(table);
+        addRows(table, transactions);
+
+        document.add(table);
+        document.close();
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    private void addTableHeader(PdfPTable table) {
+        Stream.of("Transaction ID", "Status", "To Account", "From Account", "Amount", "Timestamp")
+              .forEach(columnTitle -> {
+                  PdfPCell header = new PdfPCell();
+                  header.setPhrase(new Phrase(columnTitle));
+                  table.addCell(header);
+              });
+    }
+
+    private void addRows(PdfPTable table, List<Object[]> transactions) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        for (Object[] transaction : transactions) {
+            table.addCell(transaction[0] != null ? transaction[0].toString() : "N/A"); // Transaction ID
+            table.addCell(transaction[1] != null ? transaction[1].toString() : "N/A"); // Status
+            table.addCell(transaction[2] != null ? transaction[2].toString() : "N/A"); // To Account
+            table.addCell(transaction[3] != null ? transaction[3].toString() : "N/A"); // From Account
+            table.addCell(transaction[4] != null ? transaction[4].toString() : "N/A"); // Amount
+            table.addCell(transaction[5] != null ? dateFormat.format(transaction[5]) : "N/A"); // Timestamp
+        }
+    }
+
+    @Override
+    public void savePdfLocally(byte[] pdfData, String filePath) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(pdfData);
+        }
+    }
 }

@@ -35,12 +35,15 @@ public interface AccountDAO {
 
 
 
-	byte[] generateCsv(List<Object[]> transactions) throws Exception;
-
-	void saveCsvLocally(byte[] csvData, String filePath) throws IOException;
+//	byte[] generateCsv(List<Object[]> transactions) throws Exception;
+//
+//	void saveCsvLocally(byte[] csvData, String filePath) throws IOException;
 	
 	public int deleteByAccountNumber(Long accountNumber);
 
+	byte[] generatePdf(List<Object[]> transactions) throws IOException;
+
+	void savePdfLocally(byte[] pdfData, String filePath) throws IOException;
 	
 
 	

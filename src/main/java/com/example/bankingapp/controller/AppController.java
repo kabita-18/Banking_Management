@@ -172,36 +172,57 @@ public class AppController {
 	}
 
 	@GetMapping("/show_transaction_history/{account_number}")
-
 	public List<Object[]> getTransactionHistory(@PathVariable("account_number") Long accountNumber) {
 		return accountservice.getTransactionHistory(accountNumber);
 	}
 
-	@GetMapping("/download_transaction_history/{account_number}")
-	public void downloadTransactionHistory(@PathVariable("account_number") Long accountNumber,
-			HttpServletResponse response) throws Exception {
+//	@GetMapping("/download_transaction_history/{account_number}")
+//	public void downloadTransactionHistory(@PathVariable("account_number") Long accountNumber,
+//			HttpServletResponse response) throws Exception {
+//
+//		try {
+//
+//			List<Object[]> transactions = accountservice.getTransactionHistory(accountNumber);
+//			byte[] csvData = accountservice.generateCsv(transactions);
+//
+//			response.setContentType("text/csv");
+//			response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "filename=transaction_history.csv");
+//			response.getOutputStream().write(csvData);
+//			response.getOutputStream().flush();
+//
+//			String fileName = "transaction_history_" + System.currentTimeMillis() + ".csv";
+//			String filePath = "C:\\Users\\KABITA KUMARI\\Desktop\\transaction history download from Postman/"+ fileName;
+//			accountservice.saveCsvLocally(csvData, filePath);
+//
+//			System.out.println("CSV file saved successfully at: " + filePath);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			System.err.println("Failed to save CSV file: " + e.getMessage());
+//		}
+//	}
+	
+	 @GetMapping("/download_transaction_history/{account_number}")
+	    public void downloadTransactionHistory(@PathVariable("account_number") Long accountNumber,
+	                                           HttpServletResponse response) throws Exception {
+	        try {
+	            List<Object[]> transactions = accountservice.getTransactionHistory(accountNumber);
+	            byte[] pdfData = accountservice.generatePdf(transactions);
 
-		try {
+	            response.setContentType("application/pdf");
+	            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "filename=transaction_history.pdf");
+	            response.getOutputStream().write(pdfData);
+	            response.getOutputStream().flush();
 
-			List<Object[]> transactions = accountservice.getTransactionHistory(accountNumber);
-			byte[] csvData = accountservice.generateCsv(transactions);
+	            String fileName = "transaction_history_" + System.currentTimeMillis() + ".pdf";
+	            String filePath = "C:\\Users\\KABITA KUMARI\\Desktop\\transaction history download from Postman/" + fileName;
+	            accountservice.savePdfLocally(pdfData, filePath);
 
-			response.setContentType("text/csv");
-			response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "filename=transaction_history.csv");
-			response.getOutputStream().write(csvData);
-			response.getOutputStream().flush();
-
-			String fileName = "transaction_history_" + System.currentTimeMillis() + ".csv";
-			String filePath = "C:\\Users\\KABITA KUMARI\\Desktop\\transaction history download from Postman/"
-					+ fileName;
-			accountservice.saveCsvLocally(csvData, filePath);
-
-			System.out.println("CSV file saved successfully at: " + filePath);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println("Failed to save CSV file: " + e.getMessage());
-		}
-	}
+	            System.out.println("PDF file saved successfully at: " + filePath);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            System.err.println("Failed to save PDF file: " + e.getMessage());
+	        }
+	 }
 
 	@DeleteMapping("/delete_account/{account_number}")
 	public String deleteByAccountNumber(@PathVariable("account_number") Long accountNumber)throws AccountServiceException, ResourceNotFoundException {

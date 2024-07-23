@@ -2,11 +2,12 @@ package com.example.bankingapp.model;
 
 import java.time.LocalDate;
 import java.util.Date;
-import javax.validation.constraints.Size;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @SequenceGenerator(name = "accountNumber_seq", sequenceName = "accountNumber_seq", initialValue = 100000220)
@@ -17,6 +18,7 @@ public class Accounts {
     private Long accountNumber;
 
     @Column(name = "account_holder_name", nullable = false)
+    @Size(min = 1, max = 20)
     private String accountHolderName;
 
     @Temporal(TemporalType.DATE)

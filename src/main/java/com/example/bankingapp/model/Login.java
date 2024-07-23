@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Size;
 
 
 @Entity
@@ -11,6 +12,7 @@ public class Login {
 	 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	 	@Id
 		private Long lId;
+	 	@Size(min = 1, max = 20)
 		private String usernameOrEmail;
 	    private String password;
 		public Long getlId() {

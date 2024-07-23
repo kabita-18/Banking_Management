@@ -33,13 +33,17 @@ import com.example.bankingapp.security.JwtTokenProvider;
 import com.example.bankingapp.service.AccountServiceException;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
+
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
 import jakarta.transaction.Transactional;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
 
 
 @Repository
@@ -254,8 +258,15 @@ public class AccountDAOImpl implements AccountDAO {
         PdfWriter.getInstance(document, byteArrayOutputStream);
 
         document.open();
-
-        document.add(new Paragraph("  Transaction History   "));
+        
+        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+        Paragraph title = new Paragraph("Transaction History", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        
+        Paragraph spacer = new Paragraph(" ");
+        spacer.setSpacingBefore(10);
+        document.add(spacer);
 
         PdfPTable table = new PdfPTable(6); 
         addTableHeader(table);

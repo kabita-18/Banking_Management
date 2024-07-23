@@ -34,7 +34,7 @@ public class SecurityConfiguration {
             .csrf(csrf->csrf.disable())
             .authorizeRequests(authorizeRequests ->
                 authorizeRequests
-                    .requestMatchers( "bankingapp/register", "bankingapp/login").permitAll()
+                    .requestMatchers( "/v3/api-docs", "/swagger-ui/**", "/swagger-ui.html","bankingapp/register", "bankingapp/login").permitAll()
                     .anyRequest().authenticated()
             )
             .sessionManagement(sessionManagement ->

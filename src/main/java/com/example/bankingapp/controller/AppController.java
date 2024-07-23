@@ -37,8 +37,15 @@ import com.example.bankingapp.model.Transactions;
 import com.example.bankingapp.service.AccountService;
 import com.example.bankingapp.service.AccountServiceException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import ltts.com.exception.ResourceNotFoundException;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 
 @RestController
@@ -103,9 +110,15 @@ public class AppController {
 		throw new ResourceNotFoundException("Account already exist");
 
 	}
+	
+	@Operation(summary = "Update an account",
+		       description = "Update an existing account. The response is updated Account object with account_number, account_holder_name,"
+		       		+ "date_of_birth, account_holder_email, phone_number, and address.")
 
 	@PutMapping("update_account/{account_number}")
-	public String updatedAccountDetails(@PathVariable("account_number") long account_number, @RequestBody Accounts a)
+	public String updatedAccountDetails(@Parameter(
+		       description = "AccountNumber of account to be retrieved",
+		       required = true)@PathVariable("account_number") long account_number, @RequestBody Accounts a)
 			throws AccountServiceException, ResourceNotFoundException {
 
 		String account_holder_name = a.getAccountHolderName();
@@ -122,27 +135,42 @@ public class AppController {
 
 	}
 
+	@Tag(name = "get", description = "GET methods of getAccountDetailsByAccountNumber APIs")
 	@GetMapping("/get_account_details_by_account_number/{account_number}")
-	public Accounts getAccountDetailsByAccountNumber(@PathVariable("account_number") long accountNumber) {
+	public Accounts getAccountDetailsByAccountNumber(@Parameter(
+		       description = "AccountNumber of account to be retrieved",
+		       required = true)@PathVariable("account_number") long accountNumber) {
 		return accountservice.getAccountDetailsByAccountNumber(accountNumber);
 	}
 
+	@Operation(summary = "Update an account",
+		       description = "Update an existing account. The response is updated Account object with account_number, deposit_money.")
 	@PutMapping("deposit_money/{account_number}")
-	public Accounts deposit_money(@PathVariable("account_number") Long account_number,
+	public Accounts deposit_money(@Parameter(
+		       description = "AccountNumber of account to be retrieved",
+		       required = true)@PathVariable("account_number") Long account_number,
 			@RequestBody HashMap<String, Double> request) {
 		double deposit_balance = request.get("deposit_balance");
 		return accountservice.deposit_money(account_number, deposit_balance);
 	}
+	
+	@Operation(summary = "Update an account",
+		       description = "Update an existing account. The response is updated Account object with account_number, withdraw_money.")
 
 	@PutMapping("withdraw_money/{account_number}")
-	public Accounts withdraw_money(@PathVariable("account_number") Long account_number,
+	public Accounts withdraw_money(@Parameter(
+		       description = "AccountNumber of account to be retrieved",
+		       required = true)@PathVariable("account_number") Long account_number,
 			@RequestBody HashMap<String, Double> request) {
 		double withdraw_balance = request.get("withdraw_balance");
 		return accountservice.withdraw_money(account_number, withdraw_balance);
 	}
 
+	@Tag(name = "get", description = "GET methods of getAccountBalanceByAccountNumber APIs")
 	@GetMapping("/account_balance/{account_number}")
-	public String getAccountBalanceByAccountNumber(@PathVariable("account_number") long accountNumber)
+	public String getAccountBalanceByAccountNumber(@Parameter(
+		       description = "AccountNumber of account to be retrieved",
+		       required = true)@PathVariable("account_number") long accountNumber)
 			throws AccountServiceException, ResourceNotFoundException{
 		double total_balance = accountservice.totalBalance(accountNumber);
 		if (total_balance > 0) {
@@ -154,7 +182,9 @@ public class AppController {
 
 	@PostMapping("/transfer_money/{toAccount}")
 
-	public String transferMoney(@PathVariable("toAccount") long toAccount,
+	public String transferMoney(@Parameter(
+		       description = "AccountNumber of account to be retrieved",
+		       required = true)@PathVariable("toAccount") long toAccount,
 			@RequestBody Map<String, Object> requestBody) throws AccountServiceException, ResourceNotFoundException{
 
 		long fromAccountNumber = ((Number) requestBody.get("accountNumber")).longValue();
@@ -171,8 +201,11 @@ public class AppController {
 		}
 	}
 
+	@Tag(name = "get", description = "GET methods of show_transaction_history APIs")
 	@GetMapping("/show_transaction_history/{account_number}")
-	public List<Object[]> getTransactionHistory(@PathVariable("account_number") Long accountNumber) {
+	public List<Object[]> getTransactionHistory(@Parameter(
+		       description = "AccountNumber of account to be retrieved",
+		       required = true)@PathVariable("account_number") Long accountNumber) {
 		return accountservice.getTransactionHistory(accountNumber);
 	}
 
@@ -201,8 +234,12 @@ public class AppController {
 //		}
 //	}
 	
+	
+	@Tag(name = "get", description = "GET methods of download_transaction_history APIs")
 	 @GetMapping("/download_transaction_history/{account_number}")
-	    public void downloadTransactionHistory(@PathVariable("account_number") Long accountNumber,
+	    public void downloadTransactionHistory(@Parameter(
+			       description = "AccountNumber of account to be retrieved",
+			       required = true)@PathVariable("account_number") Long accountNumber,
 	                                           HttpServletResponse response) throws Exception {
 	        try {
 	            List<Object[]> transactions = accountservice.getTransactionHistory(accountNumber);
@@ -223,9 +260,20 @@ public class AppController {
 	            System.err.println("Failed to save PDF file: " + e.getMessage());
 	        }
 	 }
-
+	
+	@Operation(summary = "Delete an account by account number")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", content = {
+            @Content(mediaType = "application/json",
+                     schema = @Schema(implementation = Accounts.class))
+        }),
+        @ApiResponse(responseCode = "404", description = "Account not found",
+                     content = @Content)
+    })
 	@DeleteMapping("/delete_account/{account_number}")
-	public String deleteByAccountNumber(@PathVariable("account_number") Long accountNumber)throws AccountServiceException, ResourceNotFoundException {
+	public String deleteByAccountNumber(@Parameter(
+		       description = "AccountNumber of account to be retrieved",
+		       required = true)@PathVariable("account_number") Long accountNumber)throws AccountServiceException, ResourceNotFoundException {
 		int deletedCount = accountservice.deleteByAccountNumber(accountNumber);
 
 		if (deletedCount > 0) {
